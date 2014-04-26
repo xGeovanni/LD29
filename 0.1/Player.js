@@ -6,10 +6,6 @@ function Player(game){
 	this.specificUpdate = function(deltaTime){
 		var speed = Math.min(this.centre.distanceTo(mousePos) * this.mouseDistScaleFactor, this.topSpeed);
 		this.velocity = this.centre.angleTo(mousePos).mul(speed);
-		
-		if (this.checkCollision(this.hitCircle.toRect(), false, [2,])){
-			this.game.newFloor();
-		}
 	};
 	
 	this.specificAttack = function(){

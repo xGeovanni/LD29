@@ -20,7 +20,7 @@ var Game = {
 	
 	tileTypeToColour : {0 : "#59321A",
 						1 : "#707070",
-						2 : "#676767",
+						2 : "#676767"
 					},
 	
 	fillScreen : function(){
@@ -34,34 +34,8 @@ var Game = {
 		var midScreen = new Vector2(canvas.width / 2, canvas.height / 2);
 		var delta = midScreen.copy().sub(this.player.centre);
 		
-		this.grid.move(delta[0], delta[1]);
-		this.grid.screenBottomRight = [canvas.width, canvas.height];
+		this.pan(delta);
 		this.player.centre = midScreen;
-		this.player.hitCircle.centre = midScreen;
-	},
-	
-	newFloor : function(){
-		// #Newfloors
-		
-		this.grid.fillDefault();
-		this.rooms = [];
-		
-		this.rooms = MapGen.generate(this.grid);
-		
-		var canMove = [0, 0];
-		
-		do{
-			this.totalDelta = new Vector2(0, 0);
-			this.grid.topleft = new Vector2(0, 0);
-			
-			var spawnRoom = Random.choice(this.rooms);
-			var delta = [-spawnRoom.centre[0] * this.grid.tileSize[0] + canvas.width / 2, -spawnRoom.centre[1] * this.grid.tileSize[1] + canvas.height / 2];
-			
-			this.pan(delta);
-			
-			canMove = this.player.checkMove(Vector2.ZERO);
-		}
-		while(canMove[0] !== 1 || canMove[1] !== 1);
 	},
 	
 	init : function(){
@@ -76,8 +50,23 @@ var Game = {
 		window.onmousedown = function(){ Game.player.attack(); };
 		
 		this.grid = new Grid([0, 0], [75, 48], [48, 48], canvas, 0, this.tileTypeToColour);
-		this.newFloor();
 		
+		this.rooms = MapGen.generate(this.grid);
+		
+		var canMove = [0, 0];
+		
+		do{
+			this.totalDelta = new Vector2(0, 0);
+			this.grid.topleft = [0, 0];
+			
+			var spawnRoom = Random.choice(this.rooms);
+			var delta = [-spawnRoom.centre[0] * this.grid.tileSize[0] + canvas.width / 2, -spawnRoom.centre[1] * this.grid.tileSize[1] + canvas.height / 2];
+			
+			this.pan(delta);
+			
+			canMove = this.player.checkMove(Vector2.ZERO);
+		}
+		while(canMove[0] !== 1 || canMove[1] !== 1);
 	},
 	
 	update : function(){
@@ -91,6 +80,9 @@ var Game = {
 	},
 	
 	render : function(){
+		/*ctx.fillStyle = this.tileTypeToColour[0];
+		ctx.fillRect(this.grid.topleft[0], this.grid.topleft[1], this.grid.pxSize[0], this.grid.pxSize[1])*/
+		
 		this.grid.fillTiles(ctx);
 		
 		for (var i = this.creatures.length-1; i >= 0; i--){

@@ -2,7 +2,7 @@
 
 function Grid(topleft, size, tileSize, canvas, defaultTile, tileTypeToColour){
 	
-	this.topleft = new Vector2(topleft[0], topleft[1]);
+	this.topleft = topleft;
 	this.size = size;
 	this.tileSize = tileSize;
 	this.pxSize = [this.size[0] * this.tileSize[0], this.size[1] * this.tileSize[1]];
@@ -14,25 +14,17 @@ function Grid(topleft, size, tileSize, canvas, defaultTile, tileTypeToColour){
 	this.screenTopleft = [0, 0];
 	this.screenBottomRight = [canvas.width, canvas.height];
 	
-	this.defaultTile = defaultTile ? defaultTile : 0;
+	defaultTile = defaultTile ? defaultTile : 0;
 	
 	this.tileTypes = [];
 	
 	for (var i=0; i < this.size[0]; i++){
 		this.tileTypes.push([]);
-			
+		
 		for(var j=0; j < this.size[1]; j++){
-			this.tileTypes[i][j] = this.defaultTile;
+			this.tileTypes[i].push(defaultTile);
 		}
 	}
-	
-	this.fillDefault = function(){
-		for (var i=0; i < this.size[0]; i++){
-			for(var j=0; j < this.size[1]; j++){
-				this.tileTypes[i][j] = this.defaultTile;
-			}
-		}
-	};
 	
 	this.move = function(x, y){
 		if (x === 0 && y === 0){
