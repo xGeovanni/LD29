@@ -135,7 +135,7 @@ function Vector2(x, y){
 		var dx = other[0] - this[0];
 		var dy = other[1] - this[1];
 	
-		return Vector2(dy, dx).normalise();
+		return new Vector2(dx, dy).normalise();
 	};
 	
 	this.distanceTo = function(other){

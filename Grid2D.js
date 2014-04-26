@@ -1,15 +1,18 @@
 // Class assumes access to GameMaths.js and 2D Shapes.js
 
-function Grid(topleft, size, tileSize, screenTopleft, screenBottomRight, defaultTile, tileTypeToColour){
+function Grid(topleft, size, tileSize, canvas, defaultTile, tileTypeToColour){
 	
 	this.topleft = topleft;
 	this.size = size;
 	this.tileSize = tileSize;
+	this.pxSize = [this.size[0] * this.tileSize[0], this.size[1] * this.tileSize[1]];
+	
+	this.canvas = canvas;
 	
 	this.tileTypeToColour = tileTypeToColour;
 	
-	this.screenTopleft = screenTopleft ? screenTopleft : [0, 0];
-	this.screenBottomRight = screenBottomRight ? screenBottomRight : [this.size[0] * this.tileSize[0], this.size[1] * this.tileSize[1]];
+	this.screenTopleft = [0, 0];
+	this.screenBottomRight = [canvas.width, canvas.height];
 	
 	defaultTile = defaultTile ? defaultTile : 0;
 	
@@ -110,7 +113,7 @@ function Grid(topleft, size, tileSize, screenTopleft, screenBottomRight, default
 				
 				if (typeof colour === "string"){
 					ctx.fillStyle = colour;	
-					ctx.fillRect(x, y, this.tileSize[0], this.tileSize[1], 2);
+					ctx.fillRect(x, y, this.tileSize[0] + 1, this.tileSize[1] + 1);
 				}
 				else{
 					colour.style.width = this.tileSize[0] + "px";

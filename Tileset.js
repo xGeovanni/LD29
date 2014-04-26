@@ -28,8 +28,8 @@ function subCanvas(canvas, x, y, w, h){
 	return newCanvas;
 }
 
-function Tileset(image, size, tileSize){
-	
+function Tileset(image, size, tileSize, gapSize){
+	gapSize = gapSize !== undefined ? gapSize : 1;
 	
 	this.baseImage = image;
 	this.baseCanvas = imageToCanvas(this.baseImage);
@@ -40,7 +40,7 @@ function Tileset(image, size, tileSize){
 		this[i] = [];
 		
 		for (var j=0; j < this.size[1]; j++){
-			this[i].push(subCanvas(this.baseCanvas, i * this.tileSize[0], j * this.tileSize[1], this.tileSize[0], this.tileSize[1]));
+			this[i].push(subCanvas(this.baseCanvas, i * (this.tileSize[0] + gapSize), j * (this.tileSize[1] + gapSize), this.tileSize[0], this.tileSize[1]));
 		}
 	}
 }
