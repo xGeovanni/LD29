@@ -81,6 +81,8 @@ window.requestAnimFrame = (function(){
 var Key = {
 	_pressed: {},
 	
+	TAB : 9,
+	
 	ENTER : 13,
 	ALT : 18,
 
@@ -94,8 +96,7 @@ var Key = {
 	S : 83,
 	D : 68,
 	
-	ADD : 107,
-	SUBTRACT : 109,
+	R : 82,
 
 	isDown: function(keyCode) {
 		return this._pressed[keyCode];
@@ -112,3 +113,60 @@ var Key = {
 
 window.addEventListener('keyup', function(event) { Key.onKeyup(event); }, false);
 window.addEventListener('keydown', function(event) { Key.onKeydown(event); }, false);
+
+var facings = {
+    LEFT : -1,
+    RIGHT : 1,
+}
+
+function Sprite(left_images, right_images, interval, switcher){
+    this.left_images = left_images;
+    this.right_images = right_images;
+    this.interval = interval;
+    this.timeUntilAnimate = this.interval;
+    this.i = 0;
+    this.animating = true;
+    this.facing = facings.LEFT;
+    
+    this.switcher = switcher;
+    this.direction = 1;
+    
+    this.image = this.facing == facings.LEFT ? this.left_images[this.i] : this.right_images[this.i];
+    
+    this.animate = function(override){
+        this.image = this.facing == facings.LEFT ? this.left_images[this.i] : this.right_images[this.i];
+        
+        if (! this.animating && ! override){
+            return;
+        }
+        
+        this.i += 1 * this.direction;
+        
+        if (this.i >= (this.facing == facings.LEFT ? this.left_images : this.right_images).length || (this.i == 0 && this.direction == -1)){
+            if (! this.switcher){
+                this.i = 0;
+            }
+            else{
+                this.direction *= -1;
+                this.i += 1 * this.direction;
+            }
+        }
+    }
+    
+    this.update = function(){        
+        this.timeUntilAnimate -= deltaTime;
+        
+        if (this.timeUntilAnimate <= 0){
+            this.animate();
+            this.timeUntilAnimate = this.interval;
+        }
+    }
+    
+    this.draw = function(ctx, pos){
+        ctx.drawImage(this.image, pos[0], pos[1]);
+    }
+    
+    this.end = function(){
+        window.endInterval(this.intervalID);
+    }
+}

@@ -55,6 +55,15 @@ function Grid(topleft, size, tileSize, canvas, defaultTile, tileTypeToColour){
 		return tile;
 	}
 	
+	this.tileToPxCoords = function(tile){
+		var point = [tile[0] * this.tileSize[0], tile[1] * this.tileSize[1]];
+		
+		point[0] += this.topleft[0];
+		point[1] += this.topleft[1];
+		
+		return point;
+	}
+	
 	this.draw = function(ctx, colour, width){
 		ctx.strokeStyle = colour ? colour : "#000000";
 		ctx.lineWidth = width ? width : 1;

@@ -57,11 +57,11 @@ var GameRandom = {
 	//The functions herein require access to the GameMaths code.
 	
 	normalVector2 : function(){
-		return Vector2(Math.random(), Math.random()).normalise();
+		return (new Vector2(Random.uniform(-1, 1), Random.uniform(-1, 1))).normalise();
 	},
 	
 	normalVector3 : function(){
-		return Vector3(Math.random(), Math.random(), Math.random()).normalise();
+		return (new Vector3(Random.uniform(-1, 1), Random.uniform(-1, 1), Random.uniform(-1, 1))).normalise();
 	},
 	
 	colour : function(){

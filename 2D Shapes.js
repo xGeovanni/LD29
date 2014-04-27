@@ -74,7 +74,7 @@ function Circle(centre, radius, colour){
 	this.collideCircle = function(other){
 		var dx = (other.centre[0] - this.centre[0]);
 		var dy = (other.centre[1] - this.centre[1]);
-		var totalRadius = (self.radius + other.radius);
+		var totalRadius = (this.radius + other.radius);
 		
 		return (dx * dx + dy * dy < totalRadius * totalRadius);
 	};

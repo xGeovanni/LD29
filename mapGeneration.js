@@ -11,6 +11,9 @@ var MapGen = {
 	minRooms : 4,
 	maxRooms : 12,
 	
+	minLakes : 0,
+	maxLakes : 6,
+	
 	minRoomSize : [6, 6],
 	maxRoomSize : [20, 20],
 	
@@ -37,6 +40,7 @@ var MapGen = {
 		var rooms = [];
 		
 		var numRooms = Random.range(this.minRooms, this.maxRooms);
+		var numLakes = Random.range(this.minLakes, this.maxLakes);
 		
 		for (var i=0; i < numRooms; i++){
 			var pos = [Random.range(grid.size[0]), Random.range(grid.size[1])];
@@ -75,6 +79,22 @@ var MapGen = {
 			this.connectRooms(grid, rooms[i], connectTo);
 		}
 		
+		for (var i=0; i < numLakes; i++){
+			var room = Random.choice(rooms);
+			
+			var pos = [Random.range(room.pos[0] + 1, room.pos[0] + room.size[0]-1),
+			           Random.range(room.pos[1] + 1, room.pos[1] + room.size[1]-1)];
+			
+			var width = Random.range(1, room.size[0] - (pos[0] - room.pos[0]));
+			var height = Random.range(1, room.size[1] - (pos[1] - room.pos[1]));
+			
+			for(var x=pos[0]; x < pos[0] + width; x++){
+				for(var y=pos[1]; y < pos[1] + height; y++){
+					grid.tileTypes[x][y] = 3;
+				}
+			}
+		}
+		
 		var stairsTile;
 		
 		do{
@@ -83,6 +103,15 @@ var MapGen = {
 		while (grid.tileTypes[stairsTile[0]][stairsTile[1]] !== 1);
 		
 		grid.tileTypes[stairsTile[0]][stairsTile[1]] = 2;
+		
+		var chestTile;
+		
+		do{
+			chestTile = [Random.range(grid.size[0]), Random.range(grid.size[1])];
+		}
+		while (grid.tileTypes[chestTile[0]][chestTile[1]] !== 1);
+		
+		grid.tileTypes[chestTile[0]][chestTile[1]] = 4;
 		
 		return rooms;
 		

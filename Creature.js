@@ -1,4 +1,4 @@
-function Creature(game, pos, radius, colour, topSpeed, maxHealth, attackCooldown){
+function Creature(game, pos, radius, colour, topSpeed, maxHealth, strength, attackCooldown){
 	Circle.call(this, pos, radius, colour);
 	
 	this.game = game;
@@ -6,23 +6,39 @@ function Creature(game, pos, radius, colour, topSpeed, maxHealth, attackCooldown
 	
 	this.dead = false;
 	
-	this.veloctiy = new Vector2(0, 0);
+	this.velocity = new Vector2(0, 0);
 	this.topSpeed = topSpeed;
 	
 	this.hitCircle = this.copy();
 	this.hitCircle.radius = Math.floor(this.radius * .8);
 	
+	this.strength = strength;
 	this.attackCooldown = attackCooldown;
 	this.timeUntilAttack = 0;
 	
 	this.maxHealth = maxHealth;
 	this.health = this.maxHealth;
 	
-	this.impassableTiles = [0,];
+	this.impassableTiles = [0, 3, 4];
 	
 	this.specificUpdate = function(){
 	}
 	this.specificAttack = function(){
+	}
+	this.onCollisionX = function(hit){
+	}
+	this.onCollisionY = function(hit){
+	}
+	this.die = function(){
+	}
+	
+	this.damage = function(amt){
+		this.health -= amt;
+		
+		if (this.health <= 0){
+			this.dead = true;
+			this.die();
+		}
 	}
 	
 	this.attack = function(){
@@ -32,6 +48,27 @@ function Creature(game, pos, radius, colour, topSpeed, maxHealth, attackCooldown
 		
 		if (this.timeUntilAttack <= 0){
 			this.specificAttack();
+			this.timeUntilAttack = this.attackCooldown;
+		}
+	}
+	
+	this.basicAttack = function(target){
+		this.game.attackAnimations.push(new basicAttackAnimation(this, target));
+		
+		var angle = this.centre.angleTo(target);
+		var point = this.centre.copy().add(angle.mul(this.radius * 1.5));
+		var circle = new Circle(point, this.radius *.49);
+		
+		for (var j=this.game.creatures.length-1; j >= 0; j--){
+			var creature = this.game.creatures[j];
+			
+			if (creature === this || creature.dead){
+				continue;
+			}
+			
+			if (circle.collideCircle(creature)){
+				creature.damage(this.strength);
+			}
 		}
 	}
 	
@@ -48,31 +85,41 @@ function Creature(game, pos, radius, colour, topSpeed, maxHealth, attackCooldown
 		delta[0] *= canMove[0];
 		delta[1] *= canMove[1];
 		
-		this.game.pan(delta.mul(-1));
+		this.move(delta);
 		
 		this.timeUntilAttack -= deltaTime;
 	};
 	
+	this.move = function(delta){
+		this.centre.add(delta);
+		this.hitCircle.centre.add(delta);
+	}
+	
 	this.checkMove = function(delta){
 		var canMove = [1, 1];
 		
-		var testX = this.hitCircle.toRect();
-		var testY = this.hitCircle.toRect();
+		var testX = this.hitCircle.copy();
+		var testY = this.hitCircle.copy();
 		
-		testX.pos.add(delta);
-		testY.pos.add(delta);
+		testX.centre.add(delta);
+		testY.centre.add(delta);
 		
-		if (this.checkCollision(testX, true)){
+		var hit = [this.checkCollision(testX, true, true), this.checkCollision(testY, true, true)]
+		
+		if (hit[0]){
 			canMove[0] = 0;
+			this.onCollisionX(hit[0]);
 		}
-		if (this.checkCollision(testY, true)){
+		if (hit[1]){
 			canMove[1] = 0;
+			this.onCollisionY(hit[1]);
 		}
 		
 		return canMove;
 	}
 	
-	this.checkCollision = function(rect, bordersTrue, tiles){
+	this.checkCollision = function(circle, bordersTrue, creaturesTrue, tiles){
+		var rect = circle.toRect();
 		var tiles = (tiles !== undefined ? tiles : this.impassableTiles);
 		
 		corners = [rect.pos, new Vector2(rect.pos[0] + rect.size[0], rect.pos[1]), new Vector2(rect.pos[0], rect.pos[1] + rect.size[1]), rect.pos.copy().add(rect.size)];
@@ -85,7 +132,22 @@ function Creature(game, pos, radius, colour, topSpeed, maxHealth, attackCooldown
 			}
 			
 			if (tiles.indexOf(this.game.grid.tileTypes[tile[0]][tile[1]]) !== -1){
-				return true;
+				return tile;
+			}
+			
+			if (creaturesTrue){
+				
+				for (var j=this.game.creatures.length-1; j >= 0; j--){
+					var creature = this.game.creatures[j];
+					
+					if (creature === this || creature.dead){
+						continue;
+					}
+					
+					if (circle.collideCircle(creature.hitCircle)){
+						return creature;
+					}
+				}
 			}
 		}
 		
