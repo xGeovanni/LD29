@@ -19,7 +19,7 @@ function Creature(game, pos, radius, colour, topSpeed, maxHealth, strength, atta
 	this.maxHealth = maxHealth;
 	this.health = this.maxHealth;
 	
-	this.impassableTiles = [0, 3, 4];
+	this.impassableTiles = [0, 3, 4, 5];
 	
 	this.specificUpdate = function(){
 	}
@@ -104,7 +104,12 @@ function Creature(game, pos, radius, colour, topSpeed, maxHealth, strength, atta
 		testX.centre.add(delta);
 		testY.centre.add(delta);
 		
-		var hit = [this.checkCollision(testX, true, true), this.checkCollision(testY, true, true)]
+		var impassableTiles = this.impassableTiles.slice(0);
+		if (this === this.game.player && this.weapon instanceof Raft && impassableTiles.indexOf(3) !== -1){
+			impassableTiles[impassableTiles.indexOf(3)] = null;
+		}
+		
+		var hit = [this.checkCollision(testX, true, true, impassableTiles), this.checkCollision(testY, true, true, impassableTiles)]
 		
 		if (hit[0]){
 			canMove[0] = 0;

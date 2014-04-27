@@ -138,12 +138,16 @@ function Vector2(x, y){
 		return new Vector2(dx, dy).normalise();
 	};
 	
-	this.distanceTo = function(other){
+	this.distanceToSquared = function(other){
 		var dx = other[0] - this[0];
 		var dy = other[1] - this[1];
 	
-		return Math.sqrt(Math.abs(dx*dx + dy*dy));
+		return Math.abs(dx*dx + dy*dy);
 	};
+	
+	this.distanceTo = function(other){
+		return Math.sqrt(this.distanceToSquared(other));
+	}
 	
 	this.dot = function(other){
 		return (this[0] * other[0] + this[1] * other[1]);

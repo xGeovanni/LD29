@@ -16,10 +16,10 @@ function basicAttackAnimation(creature, target){
 		
 		ctx.beginPath();
 			
-		ctx.arc(this.creature.centre[0], this.creature.centre[1], this.creature.radius + 4 , this.angle - Math.PI * .25, this.angle + Math.PI * .25);
+		ctx.arc(this.creature.centre[0], this.creature.centre[1], this.creature.radius + 5 , this.angle - Math.PI * .25, this.angle + Math.PI * .25);
 			
 		ctx.strokeStyle = "#A00000"
-		ctx.lineWidth = 3;
+		ctx.lineWidth = 3.5;
 		ctx.globalAlpha = (this.timeLeft / this.time)
 		ctx.stroke();
 		ctx.globalAlpha = 1;
@@ -44,10 +44,10 @@ function ShotgunAttackAnimation(creature, target){
 		
 		ctx.beginPath();
 			
-		ctx.arc(this.creature.centre[0], this.creature.centre[1], this.creature.radius + 51 , this.angle - Math.PI * .23, this.angle + Math.PI * .23);
+		ctx.arc(this.creature.centre[0], this.creature.centre[1], this.creature.radius + 56 , this.angle - Math.PI * .15, this.angle + Math.PI * .15);
 			
 		ctx.strokeStyle = "#A00000"
-		ctx.lineWidth = 50;
+		ctx.lineWidth = 55;
 		ctx.globalAlpha = (this.timeLeft / this.time)
 		ctx.stroke();
 		ctx.globalAlpha = 1;
@@ -131,6 +131,7 @@ function BombAttackAnimation(pos, time, radius){
 	Circle.call(this, pos, radius);
 	
 	this.time = time;
+	this.damage = 150;
 	
 	this.dead = false;
 		
@@ -142,7 +143,7 @@ function BombAttackAnimation(pos, time, radius){
 		if (this.time <= 0){
 			this.dead = true;
 			
-			Game.attackAnimations.push(new Explosion(this.centre));
+			Game.attackAnimations.push(new Explosion(this.centre, this.radius));
 			
 			for (var j=Game.creatures.length-1; j >= 0; j--){
 				var creature = Game.creatures[j];
@@ -152,7 +153,9 @@ function BombAttackAnimation(pos, time, radius){
 				}
 				
 				if (this.collideCircle(creature.hitCircle)){
-					creature.damage(this.damage);
+					var damage = this.damage * (1 - (this.centre.distanceToSquared(creature.centre) / (this.radius * this.radius)));
+					
+					creature.damage(damage);
 				}
 			}
 		}
@@ -169,10 +172,10 @@ function BombAttackAnimation(pos, time, radius){
 	}
 }
 
-function Explosion(pos){
+function Explosion(pos, radius){
 	this.sprite = new Sprite([Game.tileSet[0][5], Game.tileSet[1][5], Game.tileSet[2][5], Game.tileSet[3][5], Game.tileSet[4][5]], null, .1, true);
 	
-	this.pos = pos;
+	Circle.call(this, pos, radius, "#A00000");
 	this.time = this.sprite.interval * 9;
 	
 	this.dead = false;
@@ -191,11 +194,19 @@ function Explosion(pos){
 		this.sprite.update();
 	}
 	
-	this.draw = function(){
+	this.draw = function(ctx){
 		if (this.dead){
 			return;
 		}
 		
-		this.sprite.draw([this.pos[0] - 24, this.pos[1] - 24]);
+		ctx.globalAlpha = 0.7 * (this.time / (this.sprite.interval * 9));
+		ctx.beginPath();
+		ctx.arc(this.centre[0], this.centre[1], this.radius, 0, 2 * Math.PI);
+	
+		ctx.fillStyle = this.colour;
+		ctx.fill();
+		ctx.globalAlpha = 1;
+		
+		this.sprite.draw(ctx, [this.centre[0] - 24, this.centre[1] - 24]);
 	}
 }

@@ -1,13 +1,13 @@
 /*
  * To Do:
- * More Enemies.
- * More weapons:
- * .Bomberman bombs.
+ * Sound.
  * 
  * Boss Fight. (Rick boss).
  * 
  * Fog of war?
  * Dig walls?
+ * 
+ * Shrink bat.
  * 
  * Name:
  * Delvin'
@@ -25,7 +25,7 @@ var Game = {
 	misc : [],
 	totalDelta : new Vector2(0, 0),
 	
-	enemyClasses : [Zombie, Bat],
+	enemyClasses : [Zombie, Bat, Spider],
 	timeBetweenSpawnEnemy : 4,
 	timeUntilSpawnEnemy : 0,
 	
@@ -42,6 +42,7 @@ var Game = {
 						2 : "#676767",
 						3 : "#000088",
 						4 : "7F3300",
+						5 : "#000000",
 					},
 	
 	fillScreen : function(){
@@ -120,11 +121,13 @@ var Game = {
 		this.tileTypeToColour[2] = this.tileSet[0][0];
 		this.tileTypeToColour[3] = this.tileSet[3][0];
 		this.tileTypeToColour[4] = this.tileSet[4][0];
+		this.tileTypeToColour[5] = this.tileSet[5][0];
 		
 		Blaster.image = this.tileSet[0][4];
 		SoulGun.image = this.tileSet[1][4];
 		ShotGun.image = this.tileSet[2][4];
-		Bomb.image = this.tileSet[3][4];
+		Bomb.image    = this.tileSet[3][4];
+		Raft.image    =	this.tileSet[4][4];
 		
 		this.player = new Player(this);
 		window.onmousedown = function(e){ Game.onMouseDown(e); };
@@ -207,11 +210,8 @@ var Game = {
 	},
 	
 	spawnEnemy : function(){
-		do{
-			var tile = Random.choice(this.floorTiles);
-		}
-		while (tile === undefined);
-		//console.log(tile);
+		var tile = Random.choice(this.floorTiles);;
+		
 		var enemyClass = Random.choice(this.enemyClasses);
 		var pos = this.grid.tileToPxCoords(tile);
 		

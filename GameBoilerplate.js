@@ -142,13 +142,13 @@ function Sprite(left_images, right_images, interval, switcher){
         
         this.i += 1 * this.direction;
         
-        if (this.i >= (this.facing == facings.LEFT ? this.left_images : this.right_images).length || (this.i == 0 && this.direction == -1)){
+        if (this.i >= (this.facing == facings.LEFT ? this.left_images : this.right_images).length || (this.i < 0 && this.direction == -1)){
             if (! this.switcher){
                 this.i = 0;
             }
             else{
                 this.direction *= -1;
-                this.i += 1 * this.direction;
+                this.i += this.direction;
             }
         }
     }
@@ -162,8 +162,13 @@ function Sprite(left_images, right_images, interval, switcher){
         }
     }
     
-    this.draw = function(ctx, pos){
-        ctx.drawImage(this.image, pos[0], pos[1]);
+    this.draw = function(ctx, pos, rotation){
+		if (rotation === undefined){
+			ctx.drawImage(this.image, pos[0], pos[1]);
+		}
+		else{
+			drawRotatedImage(this.image, pos, rotation);
+		}
     }
     
     this.end = function(){

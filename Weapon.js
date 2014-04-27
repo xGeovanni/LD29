@@ -39,7 +39,7 @@ function Weapon(game, cooldown, image, instructions){
 }
 
 function WeaponPickup(pos, weaponClass){
-	this.weaponClass = weaponClass !== undefined ? weaponClass : Random.choice([Blaster, SoulGun, ShotGun, Bomb]);
+	this.weaponClass = weaponClass !== undefined ? weaponClass : Random.choice([Blaster, SoulGun, ShotGun, Bomb, Raft]);
 	
 	Circle.call(this, [pos[0] + 24, pos[1] + 24], 20);
 	
@@ -176,11 +176,16 @@ function ShotGun(game){
 	}
 }
 
-Bomb.instructions = ["Bombs:", "Right click to drop a bomb", "Bombs explode 2 seconds", "after being dropped."];
+Bomb.instructions = ["Bombs:", "Right click to drop a bomb", "Bombs explode 2 seconds", "after being dropped.", "Makes sure to get", "out of the way!"];
 function Bomb(game){
 	Weapon.call(this, game, 3, Bomb.image, Bomb.instructions);
 	
 	this.specificUse = function(){
-		this.game.attackAnimations.push(new BombAttackAnimation(this.game.player.centre, 2, 48));
+		this.game.attackAnimations.push(new BombAttackAnimation(this.game.player.centre, 2, 96));
 	}
+}
+
+Raft.instructions = ["Raft:", "Allows you to cross water"];
+function Raft(game){
+	Weapon.call(this, game, 0, Raft.image, Raft.instructions);
 }

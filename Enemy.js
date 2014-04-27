@@ -17,7 +17,7 @@ function Enemy(game, pos, radius, colour, topSpeed, maxHealth, strength, attackC
 }
 
 function Zombie(game, pos){
-	Enemy.call(this, game, pos, 14, "#6D7F00", 150, 60, 10, .4);
+	Enemy.call(this, game, pos, 14, "#6D7F00", 180, 80, 10, .4);
 	
 	this.sightRadius = 300;
 	
@@ -176,5 +176,121 @@ function Bat(game, pos){
 		
 		this.dirXCooldownRemaining -= deltaTime;
 		this.dirYCooldownRemaining -= deltaTime;
+	}
+}
+
+function Spider(game, pos){
+	Enemy.call(this, game, pos, 18, "#888888", 150, 60, 8, .3);
+		
+	this.sightRadius = 200;
+	
+	var images = [this.game.tileSet[0][1], this.game.tileSet[1][1], this.game.tileSet[2][1], this.game.tileSet[3][1],
+				  this.game.tileSet[4][1], this.game.tileSet[5][1], this.game.tileSet[6][1], this.game.tileSet[7][1], this.game.tileSet[8][1]];
+	
+	this.sprite = new Sprite(images, null, .1, true);
+	
+	this.minTileCentreDist = 1;
+	
+	this.chasingPlayer = false;
+	
+	this.setUpTiles = function(){
+		this.tile = this.game.grid.pxToTileCoords(this.centre.copy());
+		this.tileCentre = this.game.grid.tileToPxCoords(this.tile);
+		this.tileCentre[0] += this.game.grid.tileSize[0] / 2;
+		this.tileCentre[1] += this.game.grid.tileSize[1] / 2;
+		this.lastTile = this.tile;
+	}
+	
+	this.setUpTiles();
+	
+	this.draw = function(ctx){
+		if(this.dead){
+			return;
+		}
+		
+		var rotation;
+		
+		if (! this.velocity.equals(Vector2.ZERO)){
+			rotation = toRadians(this.velocity.copy().normalise());
+		}
+		else{
+			rotation = 0;
+		}
+		
+		this.sprite.draw(ctx, this.centre, rotation);
+	}
+	
+	this.enemyUpdate = function(){
+		this.sprite.update();
+	}
+	
+	this.specificAttack = function(){
+		this.basicAttack(this.game.player.centre);
+	}
+	
+	this.pickNewTile = function(){
+		var sTiles = this.game.grid.surroundingTiles(this.tile);
+		var sWalkable = [];
+		
+		for (var i=sTiles.length-1; i >= 0; i--){
+			if (this.impassableTiles.indexOf(this.game.grid.tileTypes[sTiles[i][0]][sTiles[i][1]])){
+				sWalkable.push(sTiles[i]);
+			}
+		}
+		
+		var tileHolder = [];
+		tileHolder[0] = this.tile[0];
+		tileHolder[1] = this.tile[1];
+		
+		if (sWalkable.length === 0){
+			return;
+		}
+		else if (sWalkable.length === 1 || this.lastTile === null){
+			this.tile = sWalkable[0];
+		}
+		else{
+			do{
+				this.tile = Random.choice(sWalkable);
+			}
+			while(this.tile[0] === this.lastTile[0] && this.tile[1] === this.lastTile[1]);
+		}
+		
+		this.tileCentre = this.game.grid.tileToPxCoords(this.tile);
+		this.tileCentre[0] += this.game.grid.tileSize[0] / 2;
+		this.tileCentre[1] += this.game.grid.tileSize[1] / 2;
+		
+		this.lastTile = tileHolder;
+	}
+	
+	this.AI = function(){
+		if (Math.abs(this.centre[0] - this.tileCentre[0]) < this.minTileCentreDist && Math.abs(this.centre[1] - this.tileCentre[1]) < this.minTileCentreDist){
+			this.pickNewTile();
+		}
+		
+		this.velocity = this.centre.angleTo(this.tileCentre).mul(this.topSpeed * .8);
+		
+		if (this.centre.distanceTo(this.game.player.centre) < this.sightRadius){
+			this.attack();
+			this.chasingPlayer = true;
+			
+			this.velocity = this.centre.angleTo(this.game.player.centre).mul(this.topSpeed);
+		}
+		
+		else if (this.chasingPlayer){
+			this.chasingPlayer = false;
+			
+			this.setUpTiles();
+			this.pickNewTile();
+		}
+	}
+	
+	this.onCollisionX = function(){
+		this.setUpTiles();
+		this.pickNewTile();
+	}
+	
+	this.onCollisionY = function(){
+		this.setUpTiles();
+		this.pickNewTile();
 	}
 }

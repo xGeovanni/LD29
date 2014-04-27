@@ -94,6 +94,49 @@ function Grid(topleft, size, tileSize, canvas, defaultTile, tileTypeToColour){
 		ctx.stroke();
 	};
 	
+	this.surroundingTiles = function(tile, adjacent, diagonal){
+		adjacent = adjacent === undefined ? true : adjacent;
+		diagonal = diagonal === undefined ? true : diagonal;
+		
+		var tiles = [];
+		
+		if (tile[0] < 0 || tile[0] > this.size[0] || tile[1] < 0 || tile[1] > this.size[1]){
+			throw "Invalid tile co-ordiantes:" + tile;
+		}
+		
+		if (adjacent){
+			if (tile[0] > 0){
+				tiles.push([tile[0] - 1, tile[1]]);
+			}
+			if (tile[0] < this.size[0] - 1){
+				tiles.push([tile[0] + 1, tile[1]]);
+			}
+			if (tile[1] > 0){
+				tiles.push([tile[0], tile[1] - 1]);
+			}
+			if (tile[1] < this.size[1] - 1){
+				tiles.push([tile[0], tile[1] + 1]);
+			}
+		}
+		
+		if (diagonal){
+			if (tile[0] > 0 && tile[1] > 0){
+				tiles.push([tile[0] - 1, tile[1] - 1]);
+			}
+			if (tile[0] < this.size[0] - 1 && tile[1] < this.size[1] - 1){
+				tiles.push([tile[0] + 1, tile[1] + 1]);
+			}
+			if (tile[0] < this.size[0] - 1 && tile[1] > 0){
+				tiles.push([tile[0] + 1, tile[1] - 1]);
+			}
+			if (tile[0] > 0 && tile[1] - 1 < this.size[1]){
+				tiles.push([tile[0] - 1, tile[1] + 1]);
+			}
+		}
+		
+		return tiles;
+	}
+	
 	this.fillTiles = function(ctx, ignoreZero){
 		
 		if (this.tileTypeToColour === undefined){

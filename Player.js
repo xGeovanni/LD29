@@ -6,7 +6,7 @@ function Player(game){
 	
 	this.timeSinceDamage = 0;
 	
-	this.weapon = null;
+	this.weapon = new ShotGun(this.game);
 	
 	this.weaponPickupCooldown = .5;
 	this.weaponPickupCooldownRemaining = 0;
@@ -73,14 +73,15 @@ function Player(game){
 		
 		if (this.weapon !== null){
 			ctx.drawImage(this.weapon.image, this.weaponDisplay.pos[0] + 3, this.weaponDisplay.pos[1] + 3);
-		}
 		
-		var cooldownRatio = this.weapon.cooldownRemaining / this.weapon.cooldown;
-		
-		if (cooldownRatio > 0){
-			ctx.globalAlpha = 0.7 * cooldownRatio;
-			this.weaponCooldownDisplay.draw(ctx);
-			ctx.globalAlpha = 1;
+			
+			var cooldownRatio = this.weapon.cooldownRemaining / this.weapon.cooldown;
+			
+			if (cooldownRatio > 0){
+				ctx.globalAlpha = 0.7 * cooldownRatio;
+				this.weaponCooldownDisplay.draw(ctx);
+				ctx.globalAlpha = 1;
+			}
 		}
 	};
 	
@@ -116,11 +117,36 @@ function Player(game){
 		if (chestTile !== false){
 			this.game.grid.tileTypes[chestTile[0]][chestTile[1]] = 1;
 			
-			this.game.weaponPickups.push(new WeaponPickup(this.game.grid.tileToPxCoords(chestTile))); //Hack Attack feat. IM Trendle.
+			this.game.weaponPickups.push(new WeaponPickup(this.game.grid.tileToPxCoords(chestTile)));
 		}
 	}
 	
 	this.move = function(delta){
 		this.game.pan(delta.mul(-1));
 	};
+	
+	this.draw = function(ctx){
+		if (this.dead){
+			return;
+		}
+		
+		if (this.weapon instanceof Raft){
+			if (this.checkCollision(this.hitCircle, false, false, [3,])){
+				drawRotatedImage(Raft.image, this.centre, Math.abs(this.velocity[1]) > Math.abs(this.velocity[0]) ? 0 : Math.PI * .5);
+			}
+		}
+		
+		ctx.beginPath();
+		ctx.arc(this.centre[0], this.centre[1], this.radius, 0, 2 * Math.PI);
+		
+		ctx.fillStyle = this.colour;
+		ctx.fill();
+		
+		ctx.beginPath();
+		ctx.arc(this.centre[0], this.centre[1], this.radius, 0, 2 * Math.PI);
+		
+		ctx.strokeStyle = "#000000";
+		ctx.lineWidth = 2;
+		ctx.stroke();
+	}
 }
