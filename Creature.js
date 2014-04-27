@@ -19,7 +19,7 @@ function Creature(game, pos, radius, colour, topSpeed, maxHealth, strength, atta
 	this.maxHealth = maxHealth;
 	this.health = this.maxHealth;
 	
-	this.impassableTiles = [0, 3, 4, 5];
+	this.impassableTiles = [0, 3, 4, 5, 6];
 	
 	this.specificUpdate = function(){
 	}
@@ -32,13 +32,15 @@ function Creature(game, pos, radius, colour, topSpeed, maxHealth, strength, atta
 	this.die = function(){
 	}
 	
-	this.damage = function(amt){
+	this.damage = function(amt, textPos){
 		this.health -= amt;
 		
 		if (this.health <= 0){
 			this.dead = true;
 			this.die();
 		}
+		
+		this.game.attackAnimations.push(new damageText(textPos, amt));
 	}
 	
 	this.attack = function(){
@@ -67,7 +69,7 @@ function Creature(game, pos, radius, colour, topSpeed, maxHealth, strength, atta
 			}
 			
 			if (circle.collideCircle(creature)){
-				creature.damage(this.strength);
+				creature.damage(this.strength, circle.centre);
 			}
 		}
 	}

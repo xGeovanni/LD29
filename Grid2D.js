@@ -26,10 +26,12 @@ function Grid(topleft, size, tileSize, canvas, defaultTile, tileTypeToColour){
 		}
 	}
 	
-	this.fillDefault = function(){
+	this.fillDefault = function(tile){
+		tile = tile === undefined ? this.defaultTile : tile;
+		
 		for (var i=0; i < this.size[0]; i++){
 			for(var j=0; j < this.size[1]; j++){
-				this.tileTypes[i][j] = this.defaultTile;
+				this.tileTypes[i][j] = tile;
 			}
 		}
 	};

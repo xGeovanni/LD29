@@ -117,7 +117,7 @@ function Bullet(pos, velocity, colour, radius, damage, ignore){
 				}
 				
 				if (this.collideCircle(creature.hitCircle)){
-					creature.damage(this.damage);
+					creature.damage(this.damage, this.centre);
 					return true;
 				}
 			}
@@ -155,7 +155,7 @@ function BombAttackAnimation(pos, time, radius){
 				if (this.collideCircle(creature.hitCircle)){
 					var damage = this.damage * (1 - (this.centre.distanceToSquared(creature.centre) / (this.radius * this.radius)));
 					
-					creature.damage(damage);
+					creature.damage(damage, creature.centre.copy());
 				}
 			}
 		}
@@ -208,5 +208,34 @@ function Explosion(pos, radius){
 		ctx.globalAlpha = 1;
 		
 		this.sprite.draw(ctx, [this.centre[0] - 24, this.centre[1] - 24]);
+	}
+}
+
+function damageText(pos, amt){
+	this.pos = pos;
+	this.speed = 50;
+	this.font = "10pt Verdana"
+	this.amt = Math.round(amt);
+	this.colour = "FF0000";
+	this.time = 1;
+	
+	this.update = function(){
+		if (this.time < 0){
+			return;
+		}
+		
+		this.time -= deltaTime;
+		
+		this.pos[1] -= this.speed * deltaTime;
+	}
+	
+	this.draw = function(){
+		if (this.time < 0){
+			return;
+		}
+		
+		ctx.font = this.font;
+		ctx.fillStyle = this.colour;
+		ctx.fillText(this.amt, this.pos[0], this.pos[1]);
 	}
 }

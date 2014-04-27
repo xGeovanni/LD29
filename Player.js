@@ -6,7 +6,7 @@ function Player(game){
 	
 	this.timeSinceDamage = 0;
 	
-	this.weapon = new ShotGun(this.game);
+	this.weapon = null;
 	
 	this.weaponPickupCooldown = .5;
 	this.weaponPickupCooldownRemaining = 0;
@@ -43,8 +43,8 @@ function Player(game){
 		
 		if (Key.isDown(Key.ALT) || Key.isDown(Key.R)){
 			if (this.checkCollision(this.hitCircle, false, false, [2,])){
-				this.game.newFloor();
 				this.game.floor++;
+				this.game.newFloor();
 			}
 			
 			this.pickUpWeapon();

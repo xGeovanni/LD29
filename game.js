@@ -1,8 +1,10 @@
 /*
  * To Do:
- * Sound.
+ * Start / win screens.
  * 
- * Boss Fight. (Rick boss).
+ * Enemy damage indicator.
+ * 
+ * Sound.
  * 
  * Fog of war?
  * Dig walls?
@@ -33,9 +35,12 @@ var Game = {
 	weaponPickups : [],
 	
 	tileSetRaw : document.getElementById("tileset"),
+	bossSpritesRaw : document.getElementById("boss_sprites"),
 	tileSet : [],
+	bossSprites : [],
 	
 	floor : 1,
+	bossFloor : 10,
 	
 	tileTypeToColour : {0 : "#59321A",
 						1 : "#707070",
@@ -43,6 +48,7 @@ var Game = {
 						3 : "#000088",
 						4 : "7F3300",
 						5 : "#000000",
+						6 : "#000000",
 					},
 	
 	fillScreen : function(){
@@ -66,15 +72,20 @@ var Game = {
 	newFloor : function(){
 		// #Newfloors
 		
-		this.grid.fillDefault();
-		
 		this.rooms = [];
 		this.floorTiles = [];
 		this.creatures = [this.player];
 		this.attackAnimations = [];
 		this.weaponPickups = [];
-				
-		this.rooms = MapGen.generate(this.grid);
+		
+		if (this.floor === this.bossFloor){
+			this.rooms = MapGen.setUpBossFloor(this.grid);
+		}
+		
+		else{
+			this.grid.fillDefault();
+			this.rooms = MapGen.generate(this.grid);
+		}
 		
 		var canMove = [0, 0];
 		
@@ -89,7 +100,7 @@ var Game = {
 			
 			canMove = this.player.checkMove(Vector2.ZERO);
 		}
-		while(canMove[0] !== 1 || canMove[1] !== 1);
+	    while(canMove[0] !== 1 || canMove[1] !== 1);
 		
 		for (var i=0; i < this.grid.size[0]; i++){
 			for(var j=0; j < this.grid.size[1]; j++){
@@ -97,6 +108,14 @@ var Game = {
 					this.floorTiles.push([i, j]);
 				}
 			}
+		}
+		
+		if (this.floor === this.bossFloor){
+			var pos = [19 * 48 / 2 + this.grid.topleft[0], 11 * 48 - 250 + this.grid.topleft[1]];
+			
+			new Boss(this, pos);
+			
+			this.weaponPickups.push(new WeaponPickup([pos[0], pos[1] + 8 * 48], undefined, true));
 		}
 	},
 	
@@ -122,6 +141,8 @@ var Game = {
 		this.tileTypeToColour[3] = this.tileSet[3][0];
 		this.tileTypeToColour[4] = this.tileSet[4][0];
 		this.tileTypeToColour[5] = this.tileSet[5][0];
+		
+		this.bossSprites = new Tileset(this.bossSpritesRaw, [5, 1], [500, 500], 1);
 		
 		Blaster.image = this.tileSet[0][4];
 		SoulGun.image = this.tileSet[1][4];
@@ -210,6 +231,10 @@ var Game = {
 	},
 	
 	spawnEnemy : function(){
+		if (this.floor === this.bossFloor){
+			return;
+		}
+		
 		var tile = Random.choice(this.floorTiles);;
 		
 		var enemyClass = Random.choice(this.enemyClasses);

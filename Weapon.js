@@ -38,8 +38,13 @@ function Weapon(game, cooldown, image, instructions){
 	}
 }
 
-function WeaponPickup(pos, weaponClass){
-	this.weaponClass = weaponClass !== undefined ? weaponClass : Random.choice([Blaster, SoulGun, ShotGun, Bomb, Raft]);
+function WeaponPickup(pos, weaponClass, noRaft){
+	var weapons = [Blaster, SoulGun, ShotGun, Bomb];
+	if (! noRaft){
+		weapons.push(Raft);
+	}
+	
+	this.weaponClass = weaponClass !== undefined ? weaponClass : Random.choice(weapons);
 	
 	Circle.call(this, [pos[0] + 24, pos[1] + 24], 20);
 	
@@ -134,9 +139,9 @@ SoulGun.instructions = ["Soul Gun:", "WASD To fire", "Each use costs 1 health"];
 
 function SoulGun(game){
 	Blaster.call(this, game);
-	this.cooldown = .25;
+	this.cooldown = .3;
 	this.image = SoulGun.image;
-	this.bulletDamage = 40;
+	this.bulletDamage = 20;
 
 	this.selfDamage = .7;
 	
@@ -170,7 +175,7 @@ function ShotGun(game){
 			}
 			
 			if (circle.collideCircle(creature)){
-				creature.damage(this.damage);
+				creature.damage(this.damage, creature.centre.copy());
 			}
 		}
 	}

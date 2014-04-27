@@ -294,3 +294,35 @@ function Spider(game, pos){
 		this.pickNewTile();
 	}
 }
+
+function Boss(game, pos){
+	Enemy.call(this, game, pos, 300, "#009900", 0, 500, 20, 1);
+	
+	this.bulletSpeed = 400;
+	
+	var images = [this.game.bossSprites[0][0], this.game.bossSprites[1][0], this.game.bossSprites[2][0], this.game.bossSprites[3][0], this.game.bossSprites[4][0]];
+	
+	this.sprite = new Sprite(images, null, .4, true);
+	
+	this.AI = function(){
+		this.attack();
+	}
+	
+	this.enemyUpdate = function(){
+		this.sprite.update();
+	}
+	
+	this.draw = function(){
+		if (this.dead){
+			return;
+		}
+		
+		this.sprite.draw(ctx, [this.centre[0] - 250, this.centre[1] - 250]);
+	}
+	
+	this.specificAttack = function(){
+		var angle = this.centre.angleTo(this.game.player.centre);
+		
+		this.game.attackAnimations.push(new Bullet(this.centre.copy(), angle.mul(this.bulletSpeed), "#800000", 6, this.strength, [this,]));
+	}
+}
