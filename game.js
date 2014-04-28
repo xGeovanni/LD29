@@ -43,6 +43,8 @@ var Game = {
 	floor : 1,
 	bossFloor : 12,
 	
+	introScreen : document.getElementById("intro"),
+	
 	tileTypeToColour : {0 : "#59321A",
 						1 : "#707070",
 						2 : "#676767",
@@ -58,9 +60,7 @@ var Game = {
 	},
 	
 	intro : function(){
-		var screen = document.getElementById("intro");
-		
-		ctx.drawImage(screen, (canvas.width - screen.width) / 2, (canvas.height - screen.height) / 2);
+		ctx.drawImage(this.introScreen, (canvas.width - this.introScreen.width) / 2, (canvas.height - this.introScreen.height) / 2);
 	},
 	
 	playMusic : function(){
@@ -229,10 +229,9 @@ var Game = {
 	render : function(){
 		
 		if (! this.started){
+			this.intro();
 			return;
 		}
-		
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		
 		this.grid.fillTiles(ctx);
 		
@@ -313,6 +312,7 @@ function update(){
 }
 
 function render(){
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	Game.render();
 }
 
