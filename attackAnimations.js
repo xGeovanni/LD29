@@ -180,6 +180,9 @@ function Explosion(pos, radius){
 	
 	this.dead = false;
 	
+	this.sound = document.getElementById("explosion");
+	this.sound.play();
+	
 	this.update = function(){
 		if (this.dead){
 			return;

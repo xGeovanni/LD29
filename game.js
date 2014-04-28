@@ -1,10 +1,5 @@
 /*
  * To Do:
- * Start / win screens.
- * 
- * Enemy damage indicator.
- * 
- * Sound.
  * 
  * Fog of war?
  * Dig walls?
@@ -13,12 +8,14 @@
  * 
  * Name:
  * Delvin'
- * Etc.
+ * Operation: Delve
  */
  
  window.oncontextmenu = function(e){ e.preventDefault(); return false; };
 
 var Game = {
+	
+	started : false,
 	
 	player : null,
 	grid : null,
@@ -27,6 +24,8 @@ var Game = {
 	misc : [],
 	totalDelta : new Vector2(0, 0),
 	
+	timePlayerDead : 0,
+	
 	enemyClasses : [Zombie, Bat, Spider],
 	timeBetweenSpawnEnemy : 4,
 	timeUntilSpawnEnemy : 0,
@@ -34,13 +33,15 @@ var Game = {
 	attackAnimations : [],
 	weaponPickups : [],
 	
+	songs : [],
+	
 	tileSetRaw : document.getElementById("tileset"),
 	bossSpritesRaw : document.getElementById("boss_sprites"),
 	tileSet : [],
 	bossSprites : [],
 	
 	floor : 1,
-	bossFloor : 10,
+	bossFloor : 12,
 	
 	tileTypeToColour : {0 : "#59321A",
 						1 : "#707070",
@@ -54,6 +55,16 @@ var Game = {
 	fillScreen : function(){
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
+	},
+	
+	intro : function(){
+		var screen = document.getElementById("intro");
+		
+		ctx.drawImage(screen, (canvas.width - screen.width) / 2, (canvas.height - screen.height) / 2);
+	},
+	
+	playMusic : function(){
+		this.songs[Math.floor(Math.random() * this.songs.length)].play();
 	},
 	
 	onResize : function(){
@@ -120,6 +131,10 @@ var Game = {
 	},
 	
 	onMouseDown : function(e){
+		if (! this.started){
+			return;
+		}
+		
 		if (e.button === 0){
 			this.player.attack();
 		}
@@ -155,9 +170,30 @@ var Game = {
 		
 		this.grid = new Grid([0, 0], [75, 48], [48, 48], canvas, 0, this.tileTypeToColour);
 		this.newFloor();
+		
+		this.songs = [document.getElementById("song0"),
+					  document.getElementById("song1"),
+					  document.getElementById("song2"),
+					  ];
+					  
+		for (var i=this.songs.length-1; i >= 0; i--){
+			this.songs[i].addEventListener("ended", function(e){this.currentTime = 0; Game.playMusic();}, false);
+		}
+		this.playMusic();
+		
+		this.intro();
 	},
 	
 	update : function(){
+		
+		if (! this.started){
+			if (Key.isDown(Key.ENTER)){
+				this.started = true;
+			}
+			
+			return;
+		}
+		
 		for (var i = this.creatures.length-1; i >= 0; i--){
 			this.creatures[i].update();
 		}
@@ -180,9 +216,24 @@ var Game = {
 		if (this.player.weapon !== null){
 			this.player.weapon.update();
 		}
+		
+		if (this.player.dead){
+			this.timePlayerDead += deltaTime;
+			
+			if (this.timePlayerDead >= 5){
+				location.reload();
+			}
+		}
 	},
 	
 	render : function(){
+		
+		if (! this.started){
+			return;
+		}
+		
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		
 		this.grid.fillTiles(ctx);
 		
 		for (var i = this.weaponPickups.length-1; i >= 0; i--){
@@ -199,9 +250,12 @@ var Game = {
 		
 		this.player.drawHUD();
 		
-		ctx.fillStyle = "#E8FFD8";
-		ctx.font = "48pt Verdana";
-		ctx.fillText("BF " + this.floor, 0, 48);
+		if (this.player.dead){
+			ctx.globalAlpha = Math.min(1, (this.timePlayerDead / 5));
+			ctx.fillStyle = "#000000";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+		}
+	
 	},
 	
 	pan : function(delta){
@@ -259,7 +313,6 @@ function update(){
 }
 
 function render(){
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	Game.render();
 }
 
@@ -276,4 +329,4 @@ function main(){
 	})();
 }
 
-setTimeout(main, 10);
+setTimeout(main, 100);

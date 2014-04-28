@@ -11,6 +11,12 @@ function Player(game){
 	this.weaponPickupCooldown = .5;
 	this.weaponPickupCooldownRemaining = 0;
 	
+	this.weaponPickupSound = document.getElementById("pickup");
+	this.stairsSound = document.getElementById("stairs");
+	this.waterSound = document.getElementById("water");
+	
+	this.onWater = false;
+	
 	this.createHealthBars = function(){
 		this.healthBar = new Rect([0, canvas.height * .95], [canvas.width * .4, canvas.height * .05]);
 		this.redBar = this.healthBar.copy();
@@ -45,6 +51,7 @@ function Player(game){
 			if (this.checkCollision(this.hitCircle, false, false, [2,])){
 				this.game.floor++;
 				this.game.newFloor();
+				this.stairsSound.play();
 			}
 			
 			this.pickUpWeapon();
@@ -67,6 +74,11 @@ function Player(game){
 		this.greenBar.draw(ctx);
 		
 		this.weaponDisplay.draw(ctx);
+		
+		ctx.font = "16pt Verdana";
+		ctx.style = "#FFFFCC"
+		ctx.fillText("Floor: " + this.game.floor, this.weaponDisplay.pos[0] + this.weaponDisplay.size[0], this.weaponDisplay.pos[1] + this.weaponDisplay.size[1]);
+		
 		ctx.globalAlpha = 1;
 		
 		this.weaponDisplay.draw(ctx, 3, "#1E8BFF");
@@ -105,6 +117,8 @@ function Player(game){
 				this.weapon = new this.game.weaponPickups[i].weaponClass(this.game);
 				this.game.weaponPickups[i].dead = true;
 				
+				this.weaponPickupSound.play();
+				
 				break;
 			}
 		}
@@ -132,7 +146,16 @@ function Player(game){
 		
 		if (this.weapon instanceof Raft){
 			if (this.checkCollision(this.hitCircle, false, false, [3,])){
+				if (! this.onWater){
+					this.waterSound.play();
+				}
+				
+				this.onWater = true;
+				
 				drawRotatedImage(Raft.image, this.centre, Math.abs(this.velocity[1]) > Math.abs(this.velocity[0]) ? 0 : Math.PI * .5);
+			}
+			else{
+				this.onWater = false;
 			}
 		}
 		

@@ -296,7 +296,13 @@ function Spider(game, pos){
 }
 
 function Boss(game, pos){
-	Enemy.call(this, game, pos, 300, "#009900", 0, 500, 20, 1);
+	Enemy.call(this, game, pos, 300, "#009900", 0, 500, 21, 1);
+	
+	this.greetingSound = document.getElementById("boss_greeting");
+	this.deathSound = document.getElementById("boss_parting");
+	this.shootSound = document.getElementById("boss_shoot");
+	
+	this.playedGreeting = false;
 	
 	this.bulletSpeed = 400;
 	
@@ -310,6 +316,11 @@ function Boss(game, pos){
 	
 	this.enemyUpdate = function(){
 		this.sprite.update();
+		
+		if (! this.playedGreeting){
+			this.greetingSound.play();
+			this.playedGreeting = true;
+		}
 	}
 	
 	this.draw = function(){
@@ -320,7 +331,13 @@ function Boss(game, pos){
 		this.sprite.draw(ctx, [this.centre[0] - 250, this.centre[1] - 250]);
 	}
 	
+	this.die = function(){
+		this.deathSound.play();
+	}
+	
 	this.specificAttack = function(){
+		this.shootSound.play();
+		
 		var angle = this.centre.angleTo(this.game.player.centre);
 		
 		this.game.attackAnimations.push(new Bullet(this.centre.copy(), angle.mul(this.bulletSpeed), "#800000", 6, this.strength, [this,]));

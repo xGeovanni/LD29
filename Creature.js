@@ -6,6 +6,8 @@ function Creature(game, pos, radius, colour, topSpeed, maxHealth, strength, atta
 	
 	this.dead = false;
 	
+	this.attackSound = document.getElementById("attack");
+	
 	this.velocity = new Vector2(0, 0);
 	this.topSpeed = topSpeed;
 	
@@ -60,6 +62,10 @@ function Creature(game, pos, radius, colour, topSpeed, maxHealth, strength, atta
 		var angle = this.centre.angleTo(target);
 		var point = this.centre.copy().add(angle.mul(this.radius * 1.5));
 		var circle = new Circle(point, this.radius *.49);
+		
+		if (this === this.game.player){
+			this.attackSound.play();
+		}
 		
 		for (var j=this.game.creatures.length-1; j >= 0; j--){
 			var creature = this.game.creatures[j];

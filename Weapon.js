@@ -53,7 +53,7 @@ function WeaponPickup(pos, weaponClass, noRaft){
 	this.speed = 80;
 	this.velocity = GameRandom.normalVector2().mul(this.speed);
 	
-	this.instructionTime = 5;
+	this.instructionTime = 8;
 	this.instructionTimeRemaining = this.instructionTime;
 	
 	this.update = function(){
@@ -87,7 +87,7 @@ function WeaponPickup(pos, weaponClass, noRaft){
 		
 		ctx.font = size + "pt Verdana";
 		
-		var pos = [0, canvas.height * .3];
+		var pos = [0, 32];
 		
 		ctx.fillStyle = "#E8FFD8";
 		ctx.globalAlpha = (this.instructionTimeRemaining / this.instructionTime);
@@ -105,12 +105,16 @@ Blaster.instructions = ["Blaster:", "WASD To fire"];
 function Blaster(game){
 	Weapon.call(this, game, .6, Blaster.image, Blaster.instructions);
 	
+	this.shootSound = document.getElementById("shoot");
+	
 	this.bulletSpeed = 400;
 	this.bulletDamage = 20;
 	
 	this.fireDir = Vector2.UP;
 	
 	this.specificUse = function(){
+		this.shootSound.play();
+		
 		this.game.attackAnimations.push(new Bullet(this.game.player.centre.copy(), this.fireDir.copy().mul(this.bulletSpeed),
 												   "#A00000", 3, this.bulletDamage, [this.game.player,]));
 	}
@@ -146,6 +150,8 @@ function SoulGun(game){
 	this.selfDamage = .7;
 	
 	this.specificUse = function(){
+		this.shootSound.play();
+		
 		this.game.attackAnimations.push(new Bullet(this.game.player.centre.copy(), this.fireDir.copy().mul(this.bulletSpeed),
 												   "#E0E0E0", 3, this.bulletDamage, [this.game.player,]));
 												   
@@ -156,11 +162,15 @@ function SoulGun(game){
 ShotGun.instructions = ["Shotgun:", "Right click to fire"];
 
 function ShotGun(game){
-	Weapon.call(this, game, 1.2, ShotGun.image, ShotGun.instructions);
+	Weapon.call(this, game, 1, ShotGun.image, ShotGun.instructions);
+	
+	this.fireSound = document.getElementById("shotgun");
 	
 	this.damage = 50;
 	
 	this.specificUse = function(){
+		this.fireSound.play();
+		
 		this.game.attackAnimations.push(new ShotgunAttackAnimation(this.game.player, mousePos));
 		
 		var angle = this.game.player.centre.angleTo(mousePos);
@@ -183,7 +193,7 @@ function ShotGun(game){
 
 Bomb.instructions = ["Bombs:", "Right click to drop a bomb", "Bombs explode 2 seconds", "after being dropped.", "Makes sure to get", "out of the way!"];
 function Bomb(game){
-	Weapon.call(this, game, 3, Bomb.image, Bomb.instructions);
+	Weapon.call(this, game, 1.5, Bomb.image, Bomb.instructions);
 	
 	this.specificUse = function(){
 		this.game.attackAnimations.push(new BombAttackAnimation(this.game.player.centre, 2, 96));
